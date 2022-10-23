@@ -1,0 +1,20 @@
+def img_upscaling(img, size):
+    X, Y = size[0], size[1]
+    img_X, img_Y, img_Z = img.shape
+    
+    result = np.zeros(X*Y*img_Z).reshape((X, Y, img_Z))
+    step_X = np.array([X/img_X*i for i in range(img_X)] + [X]).astype(int)
+    step_Y = np.array([Y/img_Y*i for i in range(img_Y)] + [Y]).astype(int)
+    
+    for z in range(img_Z):
+        ch = np.pad(img[:, :, z], ((0,1),(0,1)), 'constant', constant_values=0)
+        for i, x in enumerate(step_X[1:]):
+            sx = x - step_X[i]
+            for j, y in enumerate(step_Y[1:]):
+                sy = y - step_Y[j]
+                a, b, c = ch[i, j+1], ch[i+1, j], ch[i, j]
+                #t = np.array([[c + ((a - c) / sy * (k / (k+n))) + ((b - c) / sx * (n / (k+n))) if k+n > 0 else c for k in range(sy)] for n in range(sx)])
+                t = np.array([[c + ((((a - c) / sy * k) + ((b - c) / sx * n)) / 2) for k in range(sy)] for n in range(sx)])
+                result[step_X[i]:x, step_Y[j]:y, z] = t
+    
+    return result
