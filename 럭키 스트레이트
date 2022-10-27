@@ -1,0 +1,9 @@
+while True:
+    input_ = list(map(int, input()))
+    if len(input_) % 2 == 0:
+        center = len(input_) // 2
+        if sum(input_[:center]) == sum(input_[center:]):
+            print('LUCKY')
+        else:
+            print('READY')
+        break
